@@ -1,6 +1,7 @@
 import argparse
 import commands.art
 import commands.genconfig
+import commands.reset
 import commands.refresh
 import commands.set_art
 import commands.turn

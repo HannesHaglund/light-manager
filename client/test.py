@@ -2,6 +2,7 @@ import unittest
 import os
 import re
 import subprocess
+from commands.utilities.config import Config
 
 def local_path():
     return os.path.realpath('.')
@@ -24,6 +25,9 @@ def run_manager(argstr, test_case=None):
             print(err)
             test_case.assertTrue(False)
     return out
+
+def test_config():
+    return Config(local_path() + '/test_config.conf')
 
 class TestCommands(unittest.TestCase):
 
@@ -55,10 +59,19 @@ class TestCommands(unittest.TestCase):
     def test_turn(self):
         t = run_manager('turn 0 off --dry-run ' + \
                         local_path() + '/test_config.conf', self)
-        # TODO test that it is off
+        self.assertFalse(test_config().light_on(0))
         t = run_manager('turn 0 on --dry-run ' + \
                         local_path() + '/test_config.conf', self)
-        # TODO test that it is on
+        self.assertTrue(test_config().light_on(0))
+        t = run_manager('reset --dry-run ' + \
+                        '-t 0100 -d 20180903 ' + # A monday, 0100 \
+                        local_path() + '/test_config.conf', self)
+        self.assertFalse(test_config().light_on(0))
+
+
+    def test_refresh_no_crash(self):
+        run_manager('refresh --dry-run ' + \
+                    local_path() + '/test_config.conf', self)
 
 
 
