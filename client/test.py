@@ -31,6 +31,12 @@ def test_config():
 
 class TestCommands(unittest.TestCase):
 
+    def setUp(self):
+        self.config_backup = test_config()
+
+    def tearDown(self):
+        self.config_backup.write()
+
     def test_help(self):
         t = run_manager('-h', self)
         self.assertTrue('usage' in t)
