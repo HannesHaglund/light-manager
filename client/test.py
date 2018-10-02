@@ -75,6 +75,22 @@ class TestCommands(unittest.TestCase):
         self.assertFalse(test_config().light_on(0))
 
 
+    def test_toggle(self):
+        t = run_manager('turn 0 on --dry-run ' + \
+                        local_path() + '/test_config.conf', self)
+        self.assertTrue(test_config().light_on(0))
+        t = run_manager('toggle 0 --dry-run ' + \
+                        local_path() + '/test_config.conf', self)
+        self.assertFalse(test_config().light_on(0))
+        t = run_manager('toggle 0 --dry-run ' + \
+                        local_path() + '/test_config.conf', self)
+        self.assertTrue(test_config().light_on(0))
+        t = run_manager('reset --dry-run ' + \
+                        '-t 0100 -d 20180903 ' + # A monday, 0100 \
+                        local_path() + '/test_config.conf', self)
+        self.assertFalse(test_config().light_on(0))
+
+
     def test_refresh_no_crash(self):
         run_manager('refresh --dry-run ' + \
                     local_path() + '/test_config.conf', self)

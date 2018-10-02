@@ -5,6 +5,7 @@ import commands.reset
 import commands.refresh
 import commands.set_art
 import commands.turn
+import commands.toggle
 import commands.upcoming_events
 from datetime import datetime
 
@@ -53,6 +54,14 @@ def main():
                       dest='dry_run', action='store_true',
                       help='Do not send commands to toggle lights.')
 
+    toggle = subparsers.add_parser('toggle',
+                              description='Change the state of a specific light.')
+    toggle.add_argument('lightID', type=int, help='Light identifier, an integer >= 0.')
+    toggle.add_argument('config', type=str, help='System path to config file.')
+    toggle.add_argument('--dry-run',
+                      dest='dry_run', action='store_true',
+                      help='Do not send commands to toggle lights.')
+
     refresh = subparsers.add_parser('refresh',
                               description='Send signals to apply the last state used to all lights. Lights that were turned off will be told to turn off, and vise versa.')
     refresh.add_argument('config', type=str, help='System path to config file.')
@@ -79,6 +88,8 @@ def main():
         commands.reset.do(args.config, args.date, args.time, args.dry_run)
     if args.command == 'turn':
         commands.turn.do(args.config, args.lightID, args.state, args.dry_run)
+    if args.command == 'toggle':
+        commands.toggle.do(args.config, args.lightID, args.dry_run)
     if args.command == 'set-art':
         commands.set_art.do(args.config, args.art)
     if args.command == 'art':
