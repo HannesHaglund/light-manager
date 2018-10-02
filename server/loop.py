@@ -82,4 +82,4 @@ def loop(hostname, port, \
         thread.join()
 
 if __name__ == '__main__':
-    loop('', 5347, True)
+    loop('', 5348, False)
