@@ -3,7 +3,7 @@ import time
 import socket
 import threading
 
-def _handle_client_request(client, toggle_attempts_to_make):
+def _handle_client_request(client, dry_run, toggle_attempts_to_make):
     '''
     Receive messages that adheres to the following form:
     b'<system id> <device id> <state>\0'
@@ -43,7 +43,7 @@ def _handle_client_request(client, toggle_attempts_to_make):
         return True
 
     def send_response(return_status):
-        msg = b'1' if return_status else b'0'
+        msg = b'\1' if return_status else b'\0'
         sent = client.send(msg)
         if sent <= 0:
             raise RuntimeError('Socket broken')
@@ -51,8 +51,11 @@ def _handle_client_request(client, toggle_attempts_to_make):
     args = receive_msg()
     print('Incoming msg:', args)
     if verify_args(args):
-        toggle_outlet(args[0], args[1], args[2])
-        print('Outlet was succesfully toggled (args=', args, ')')
+        if not dry_run:
+            toggle_outlet(args[0], args[1], args[2])
+            print('Outlet was succesfully toggled (args=', args, ')')
+        else:
+            print('Outlet was not toggled due to dry run (args=', args, ')')
         send_response(True)
     else:
         print('Error:', args, 'are not valid')
@@ -60,6 +63,7 @@ def _handle_client_request(client, toggle_attempts_to_make):
     client.close()
 
 def loop(hostname, port, \
+         dry_run = False, \
          queue_limit = 5, \
          socket_timeout = 60, \
          toggle_attempts_to_make = 2):
@@ -73,9 +77,9 @@ def loop(hostname, port, \
         client.settimeout(socket_timeout)
         print('Incoming client, address =', address)
         thread = threading.Thread(target=_handle_client_request, \
-                         args=(client, toggle_attempts_to_make))
+                         args=(client, dry_run, toggle_attempts_to_make))
         thread.start()
         thread.join()
 
 if __name__ == '__main__':
-    loop('', 5347)
+    loop('', 5347, True)
